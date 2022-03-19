@@ -1,0 +1,99 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<h1>只提供查询日语</h1>
+请输入你要查询的单词:<input id="danciJapen" ><button onclick="searchJapen()">查询</button>
+<button onclick="searchAll()">同时查询日语和英语</button>
+<div>
+    <textarea name="" id="japenContent" cols="30" rows="10"></textarea>
+</div>
+<h1>由于工作中写代码要用英语，所以我把英语也写一下吧</h1>
+请输入你要查询的单词:<input id="danciEnglish" ><button onclick="searchEnglish()">查询</button>
+<div>
+    <textarea name="" id="englishContent" cols="30" rows="10"></textarea>
+</div>
+
+
+<script src="http://apps.bdimg.com/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="./md5.js"></script>
+<script type="text/javascript">
+var appid = '20211226001038973';
+var key = 'FBglLpG2IMztzR3R4Cfa';
+var salt = (new Date).getTime();
+function searchJapen(){
+    var query = $("#danciJapen").val();
+    // console.log(query);
+    
+    // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+    var from = 'zh';
+    var to = 'jp';
+    var str1 = appid + query + salt +key;
+    var sign = MD5(str1);
+    $.ajax({
+        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+        type: 'get',
+        dataType: 'jsonp',
+        data: {
+            q: query,
+            appid: appid,
+            salt: salt,
+            from: from,
+            to: to,
+            sign: sign
+        },
+        success: function (data) {
+            console.log(data.trans_result[0].dst);
+            let japen=data.trans_result[0].dst;
+            $("#japenContent").text(japen)
+        } 
+    });
+
+}
+
+function searchEnglish(){
+    var query = $("#danciEnglish").val();
+    console.log(query=='');
+    
+    if(query==''){
+        query =  $("#danciJapen").val();
+    }
+    // console.log(query);
+    
+    // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+    var from = 'zh';
+    var to = 'en';
+    var str1 = appid + query + salt +key;
+    var sign = MD5(str1);
+    $.ajax({
+        url: 'http://api.fanyi.baidu.com/api/trans/vip/translate',
+        type: 'get',
+        dataType: 'jsonp',
+        data: {
+            q: query,
+            appid: appid,
+            salt: salt,
+            from: from,
+            to: to,
+            sign: sign
+        },
+        success: function (data) {
+            console.log(data);
+            
+            console.log(data.trans_result[0].dst);
+            let english=data.trans_result[0].dst;
+            $("#englishContent").text(english)
+        } 
+    });
+
+}
+
+function searchAll(){
+    searchJapen();
+   
+    setTimeout(function(){ searchEnglish();},3000)
+}
+
+</script>
+</body>
